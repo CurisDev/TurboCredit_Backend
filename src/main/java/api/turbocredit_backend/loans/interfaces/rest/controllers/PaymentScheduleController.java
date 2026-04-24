@@ -1,6 +1,7 @@
 package api.turbocredit_backend.loans.interfaces.rest.controllers;
 
 import api.turbocredit_backend.loans.application.internal.queryservices.VehicleCreditQueryServiceImpl;
+import api.turbocredit_backend.iam.infrastructure.authorization.sfs.model.UserDetailsImpl;
 import api.turbocredit_backend.loans.interfaces.rest.resources.AmortizationScheduleResource;
 import api.turbocredit_backend.loans.interfaces.rest.resources.PaymentScheduleItemResource;
 import api.turbocredit_backend.loans.interfaces.rest.transform.VehicleCreditDtoAssembler;
@@ -19,7 +20,7 @@ import java.util.stream.Collectors;
 @RestController
 @RequestMapping("/api/v1/payment-schedules")
 @Tag(name = "Payment Schedules", description = "Payment schedule endpoints")
-@SecurityRequirement(name = "Bearer")
+@SecurityRequirement(name = "bearerAuth")
 @RequiredArgsConstructor
 public class PaymentScheduleController {
 
@@ -46,7 +47,8 @@ public class PaymentScheduleController {
     public ResponseEntity<List<PaymentScheduleItemResource>> getPendingPayments(
             Authentication authentication) {
 
-        UUID userId = UUID.fromString(authentication.getName());
+        UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();
+        UUID userId = userDetails.getId();
 
         // Este método requiere una consulta personalizada en el repositorio
         // que retorne solo los items pendientes del usuario

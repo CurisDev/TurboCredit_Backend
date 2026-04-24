@@ -8,6 +8,7 @@ import api.turbocredit_backend.profiles.domain.model.valueobjects.PhoneNumber;
 import api.turbocredit_backend.profiles.interfaces.rest.resources.CreateProfileRequest;
 import api.turbocredit_backend.profiles.interfaces.rest.resources.ProfileResource;
 import api.turbocredit_backend.profiles.interfaces.rest.transform.ProfileDtoAssembler;
+import api.turbocredit_backend.iam.infrastructure.authorization.sfs.model.UserDetailsImpl;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -23,7 +24,7 @@ import java.util.UUID;
 @RestController
 @RequestMapping("/api/v1/profiles")
 @Tag(name = "Profiles", description = "Profile management endpoints")
-@SecurityRequirement(name = "Bearer")
+@SecurityRequirement(name = "bearerAuth")
 @RequiredArgsConstructor
 public class ProfileController {
 
@@ -36,7 +37,8 @@ public class ProfileController {
             @Valid @RequestBody CreateProfileRequest request,
             Authentication authentication) {
 
-        UUID userId = UUID.fromString(authentication.getName());
+        UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();
+        UUID userId = userDetails.getId();
 
         var profile = profileCommandService.createProfile(
                 userId,

@@ -18,14 +18,16 @@ public class UserDetailsImpl implements UserDetails {
     private final String username; // email as username
     @JsonIgnore
     private final String password;
+    private final java.util.UUID id;
     private final Collection<? extends GrantedAuthority> authorities;
     private final boolean accountNonExpired = true;
     private final boolean accountNonLocked = true;
     private final boolean credentialsNonExpired = true;
     private final boolean enabled = true;
 
-    public UserDetailsImpl(String username, String password,
+    public UserDetailsImpl(java.util.UUID id, String username, String password,
                            Collection<? extends GrantedAuthority> authorities) {
+        this.id = id;
         this.username = username;
         this.password = password;
         this.authorities = authorities;
@@ -35,6 +37,6 @@ public class UserDetailsImpl implements UserDetails {
         var authorities = user.getRoles().stream()
                 .map(role -> new SimpleGrantedAuthority(role.getName().name()))
                 .collect(Collectors.toList());
-        return new UserDetailsImpl(user.getEmail(), user.getPasswordHash(), authorities);
+        return new UserDetailsImpl(user.getId(), user.getEmail(), user.getPasswordHash(), authorities);
     }
 }
