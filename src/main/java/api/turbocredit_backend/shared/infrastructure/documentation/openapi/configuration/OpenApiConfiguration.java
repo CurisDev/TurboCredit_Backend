@@ -40,7 +40,7 @@ public class OpenApiConfiguration {
                 .version(this.applicationVersion)
                 .license(new License().name("Apache 2.0")
                         .url("http://www.apache.org/licenses/LICENSE-2.0"))).externalDocs(
-                new ExternalDocumentation().description("Centralis wiki Documentation")
+                new ExternalDocumentation().description("TurboCredit wiki Documentation")
                         .url("https://i.pinimg.com/1200x/16/f6/92/16f6922a35973a131cf6f690fe53dcfd.jpg"));
 
         final String securitySchemeName = "bearerAuth";

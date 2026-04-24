@@ -20,19 +20,18 @@ spring:
           batch_size: 20
         order_inserts: true
         order_updates: true
-  documentation:
-    application:
-      description: "TurboCredit Backend - Vehicle Loan Management System"
-      version: "1.0.0"
-  server:
-    port: 8082
-  logging:
-    level:
-      root: INFO
-      org.springframework.web: INFO
-      org.springframework.security: INFO
-      org.hibernate.SQL: DEBUG
-      org.hibernate.type.descriptor.sql.BasicBinder: TRACE
-  #firebase:
-  #  credentials: ${FIREBASE_CREDENTIALS_PATH}
+documentation:
+  application:
+    description: "TurboCredit Backend - Vehicle Loan Management System"
+    version: "1.0.0"
+
+server:
+  port: 8082
+
+authorization:
+  jwt:
+    secret: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiYWRtaW4iOnRydWUsImlhdCI6MTUxNjIzOTAyMn0.KMUFsIDTnFmyG3nMiGM6H9FNFUROf3wh7SmqJp-QV30"
+    expiration:
+      days: 7
+
 

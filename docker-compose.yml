@@ -1,0 +1,17 @@
+services:
+  postgres:
+    image: postgres:18
+    container_name: turbo-credit-db-containes
+    restart: always
+    environment:
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: admin
+      POSTGRES_DB: turbo-credit-db
+      PGDATA: /var/lib/postgresql/data/pgdata
+    ports:
+      - "5432:5432"                  # Mapea el puerto de tu PC al del contenedor
+    volumes:
+      - pg18_data:/var/lib/postgresql/data # Guarda los datos permanentemente
+
+volumes:
+  pg18_data: # Define el volumen para la persistencia de datos
