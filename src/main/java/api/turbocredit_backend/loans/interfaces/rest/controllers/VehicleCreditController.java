@@ -36,7 +36,7 @@ public class VehicleCreditController {
 
     @PostMapping("/request")
     @Operation(summary = "Request a new vehicle credit")
-    @PreAuthorize("hasAuthority('ROLE_USER')")
+    @PreAuthorize("hasAnyAuthority('ROLE_USER', 'ROLE_ADMIN')")
     public ResponseEntity<VehicleCreditResource> createVehicleCredit(
             @Valid @RequestBody CreateVehicleCreditRequest request,
             Authentication authentication) {
@@ -57,6 +57,20 @@ public class VehicleCreditController {
                     Currency.of(request.getCurrency()),
                     request.getInsuranceCost()
             );
+
+            // Cargar datos adicionales del crédito vehicular
+            credit.setClientName(request.getClientName());
+            credit.setClientDni(request.getClientDni());
+            credit.setVehicleBrand(request.getVehicleBrand());
+            credit.setVehicleModel(request.getVehicleModel());
+            credit.setResidualPercentage(request.getResidualPercentage());
+            credit.setSeguroDesgravamenRate(request.getSeguroDesgravamenRate());
+            credit.setSeguroVehicularMonthly(request.getSeguroVehicularMonthly());
+            credit.setPortes(request.getPortes());
+            credit.setGastosAdministrativos(request.getGastosAdministrativos());
+            credit.setComisionDesembolso(request.getComisionDesembolso());
+            credit.setComisionEvaluacion(request.getComisionEvaluacion());
+            credit.setCok(request.getCok());
 
             // Validar riesgo
             if (request.getMonthlyIncome() != null) {

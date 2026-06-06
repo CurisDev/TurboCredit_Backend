@@ -66,4 +66,40 @@ public class CreateVehicleCreditRequest {
     // Para validación de riesgo
     @Schema(description = "Monthly income (for risk validation)", example = "5000.00")
     private BigDecimal monthlyIncome;
+
+    @Schema(description = "Client name", example = "Juan Perez")
+    private String clientName;
+
+    @Schema(description = "Client DNI", example = "12345678")
+    private String clientDni;
+
+    @Schema(description = "Vehicle brand", example = "Toyota")
+    private String vehicleBrand;
+
+    @Schema(description = "Vehicle model", example = "Corolla")
+    private String vehicleModel;
+
+    @Schema(description = "Residual percentage for final payment", example = "40.0")
+    private BigDecimal residualPercentage;
+
+    @Schema(description = "Seguro desgravamen rate", example = "0.0005")
+    private BigDecimal seguroDesgravamenRate;
+
+    @Schema(description = "Seguro vehicular monthly cost", example = "150.0")
+    private BigDecimal seguroVehicularMonthly;
+
+    @Schema(description = "Portes monthly cost", example = "15.0")
+    private BigDecimal portes;
+
+    @Schema(description = "Gastos administrativos monthly cost", example = "30.0")
+    private BigDecimal gastosAdministrativos;
+
+    @Schema(description = "Comision desembolso initial cost", example = "500.0")
+    private BigDecimal comisionDesembolso;
+
+    @Schema(description = "Comision evaluacion initial cost", example = "265.0")
+    private BigDecimal comisionEvaluacion;
+
+    @Schema(description = "Cost of opportunity COK", example = "10.0")
+    private BigDecimal cok;
 }

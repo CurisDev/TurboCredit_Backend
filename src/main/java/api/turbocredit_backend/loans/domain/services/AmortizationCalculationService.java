@@ -23,10 +23,10 @@ public class AmortizationCalculationService {
         List<PaymentScheduleItem> schedule = new ArrayList<>();
 
         BigDecimal monthlyRate = loan.getPeriodicRate().divide(new BigDecimal(100), 10, RoundingMode.HALF_UP);
-        BigDecimal remainingBalance = loan.getPrincipalFinanced();
+        BigDecimal remainingBalance = loan.getLoanAmount(); // Saldo inicial: Monto del préstamo (Vehículo - Cuota Inicial)
         BigDecimal fixedInstallment = loan.getFixedInstallment();
 
-        int gracePeriods = loan.getGracePeriodMonths();
+        int gracePeriods = loan.getGracePeriodMonths() != null ? loan.getGracePeriodMonths() : 0;
         int totalPeriods = loan.getTermMonths();
         GracePeriodType gracePeriodType = loan.getGracePeriodType();
 
@@ -39,27 +39,43 @@ public class AmortizationCalculationService {
             calendar.add(Calendar.MONTH, 1);
             Date dueDate = (Date) calendar.getTime().clone();
 
-            BigDecimal interestDueGrace = BigDecimal.ZERO;
+            BigDecimal interestDueGrace = remainingBalance.multiply(monthlyRate).setScale(2, RoundingMode.HALF_UP);
             BigDecimal amortizationDueGrace = BigDecimal.ZERO;
-            BigDecimal installmentDueGrace = fixedInstallment;
+            BigDecimal installmentDueGrace = BigDecimal.ZERO;
 
             if (gracePeriodType.isPartial()) {
-                // Período de gracia parcial: solo interés
-                interestDueGrace = remainingBalance.multiply(monthlyRate)
-                        .setScale(2, RoundingMode.HALF_UP);
+                // Gracia parcial: se paga interés, el saldo no cambia
                 installmentDueGrace = interestDueGrace;
-            } else if (gracePeriodType.isTotal()) {
-                // Período de gracia total: sin interés ni capital
-                installmentDueGrace = BigDecimal.ZERO;
+            } else {
+                // Gracia total: no se paga interés ni capital, el interés capitaliza
+                remainingBalance = remainingBalance.add(interestDueGrace);
             }
 
+            // Seguros y gastos mensuales
+            BigDecimal lifeInsurance = remainingBalance.multiply(loan.getSeguroDesgravamenRate()).setScale(2, RoundingMode.HALF_UP);
+            BigDecimal vehicularInsurance = loan.getSeguroVehicularMonthly() != null ? loan.getSeguroVehicularMonthly() : BigDecimal.ZERO;
+            BigDecimal portes = loan.getPortes() != null ? loan.getPortes() : BigDecimal.ZERO;
+            BigDecimal adminFee = loan.getGastosAdministrativos() != null ? loan.getGastosAdministrativos() : BigDecimal.ZERO;
+
+            BigDecimal totalInstallment = installmentDueGrace
+                    .add(lifeInsurance)
+                    .add(vehicularInsurance)
+                    .add(portes)
+                    .add(adminFee)
+                    .setScale(2, RoundingMode.HALF_UP);
+
             PaymentScheduleItem item = PaymentScheduleItem.builder()
-                    .creditId(loan.getId())  // ✅ CORRECTO: loan.getId() retorna Long
+                    .creditId(loan.getId())
                     .userId(loan.getUserId())
                     .period(period)
                     .installment(installmentDueGrace)
                     .interest(interestDueGrace)
                     .amortization(amortizationDueGrace)
+                    .lifeInsurance(lifeInsurance)
+                    .vehicularInsurance(vehicularInsurance)
+                    .portes(portes)
+                    .administrationFee(adminFee)
+                    .totalInstallment(totalInstallment)
                     .remainingBalance(remainingBalance)
                     .isGracePeriod(true)
                     .isPaid(false)
@@ -74,31 +90,53 @@ public class AmortizationCalculationService {
             calendar.add(Calendar.MONTH, 1);
             Date dueDate = (Date) calendar.getTime().clone();
 
+            // Saldo inicial del periodo para el seguro de desgravamen
+            BigDecimal balanceBeforePayment = remainingBalance;
+
             // Interés = Saldo pendiente * Tasa mensual
-            BigDecimal interest = remainingBalance.multiply(monthlyRate)
-                    .setScale(2, RoundingMode.HALF_UP);
+            BigDecimal interest = balanceBeforePayment.multiply(monthlyRate).setScale(2, RoundingMode.HALF_UP);
 
-            // Amortización = Cuota fija - Interés
-            BigDecimal amortization = fixedInstallment.subtract(interest)
-                    .setScale(2, RoundingMode.HALF_UP);
+            BigDecimal amortization;
+            BigDecimal installment;
 
-            // Saldo restante = Saldo anterior - Amortización
-            remainingBalance = remainingBalance.subtract(amortization)
-                    .setScale(2, RoundingMode.HALF_UP);
-
-            // En la última cuota, ajustar por redondeo
-            if (period == totalPeriods && remainingBalance.compareTo(BigDecimal.ZERO) != 0) {
-                amortization = amortization.add(remainingBalance);
+            // Si es el último periodo (mes N), se paga la cuota fija base más el valor residual (VF)
+            if (period == totalPeriods) {
+                // La amortización es exactamente el saldo restante
+                amortization = remainingBalance;
+                installment = amortization.add(interest);
                 remainingBalance = BigDecimal.ZERO;
+            } else {
+                // Amortización = Cuota fija - Interés
+                installment = fixedInstallment;
+                amortization = installment.subtract(interest).setScale(2, RoundingMode.HALF_UP);
+                remainingBalance = remainingBalance.subtract(amortization).setScale(2, RoundingMode.HALF_UP);
             }
+
+            // Seguros y gastos mensuales
+            BigDecimal lifeInsurance = balanceBeforePayment.multiply(loan.getSeguroDesgravamenRate()).setScale(2, RoundingMode.HALF_UP);
+            BigDecimal vehicularInsurance = loan.getSeguroVehicularMonthly() != null ? loan.getSeguroVehicularMonthly() : BigDecimal.ZERO;
+            BigDecimal portes = loan.getPortes() != null ? loan.getPortes() : BigDecimal.ZERO;
+            BigDecimal adminFee = loan.getGastosAdministrativos() != null ? loan.getGastosAdministrativos() : BigDecimal.ZERO;
+
+            BigDecimal totalInstallment = installment
+                    .add(lifeInsurance)
+                    .add(vehicularInsurance)
+                    .add(portes)
+                    .add(adminFee)
+                    .setScale(2, RoundingMode.HALF_UP);
 
             PaymentScheduleItem item = PaymentScheduleItem.builder()
                     .creditId(loan.getId())
                     .userId(loan.getUserId())
                     .period(period)
-                    .installment(fixedInstallment)
+                    .installment(installment)
                     .interest(interest)
                     .amortization(amortization)
+                    .lifeInsurance(lifeInsurance)
+                    .vehicularInsurance(vehicularInsurance)
+                    .portes(portes)
+                    .administrationFee(adminFee)
+                    .totalInstallment(totalInstallment)
                     .remainingBalance(remainingBalance)
                     .isGracePeriod(false)
                     .isPaid(false)
