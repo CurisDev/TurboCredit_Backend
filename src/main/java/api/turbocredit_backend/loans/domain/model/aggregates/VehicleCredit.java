@@ -135,6 +135,22 @@ public class VehicleCredit extends AuditableAbstractAggregateRootWithLongId<Vehi
     @Column(name = "bank_name")
     private String bankName;
 
+    public void setNpv(BigDecimal npv) {
+        this.npv = npv;
+    }
+
+    public void setIrr(BigDecimal irr) {
+        this.irr = irr;
+    }
+
+    public void setTcea(BigDecimal tcea) {
+        this.tcea = tcea;
+    }
+
+    public BigDecimal getIrr() {
+        return this.irr;
+    }
+
     public VehicleCredit(UUID userId, BigDecimal vehiclePrice, BigDecimal downPayment,
                          BigDecimal loanAmount, InterestRate interestRate, Integer termMonths,
                          Integer gracePeriodMonths, GracePeriodType gracePeriodType,

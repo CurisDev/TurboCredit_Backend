@@ -36,7 +36,7 @@ public class VehicleCreditController {
 
     @PostMapping("/request")
     @Operation(summary = "Request a new vehicle credit")
-    @PreAuthorize("hasAuthority('ROLE_USER')")
+    @PreAuthorize("hasAnyAuthority('ROLE_USER', 'ROLE_ADMIN')")
     public ResponseEntity<VehicleCreditResource> createVehicleCredit(
             @Valid @RequestBody CreateVehicleCreditRequest request,
             Authentication authentication) {
