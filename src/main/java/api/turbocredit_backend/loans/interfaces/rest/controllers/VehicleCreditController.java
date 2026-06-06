@@ -58,6 +58,20 @@ public class VehicleCreditController {
                     request.getInsuranceCost()
             );
 
+            // Cargar datos adicionales del crédito vehicular
+            credit.setClientName(request.getClientName());
+            credit.setClientDni(request.getClientDni());
+            credit.setVehicleBrand(request.getVehicleBrand());
+            credit.setVehicleModel(request.getVehicleModel());
+            credit.setResidualPercentage(request.getResidualPercentage());
+            credit.setSeguroDesgravamenRate(request.getSeguroDesgravamenRate());
+            credit.setSeguroVehicularMonthly(request.getSeguroVehicularMonthly());
+            credit.setPortes(request.getPortes());
+            credit.setGastosAdministrativos(request.getGastosAdministrativos());
+            credit.setComisionDesembolso(request.getComisionDesembolso());
+            credit.setComisionEvaluacion(request.getComisionEvaluacion());
+            credit.setCok(request.getCok());
+
             // Validar riesgo
             if (request.getMonthlyIncome() != null) {
                 credit.calculateFixedInstallment(); // Asegurar que exista cuota fija antes de validar riesgo
