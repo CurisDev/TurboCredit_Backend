@@ -108,15 +108,6 @@ public class VehicleCreditResource {
     @Schema(description = "Portes monthly cost", example = "15.0")
     private BigDecimal portes;
 
-    @Schema(description = "Gastos administrativos monthly cost", example = "30.0")
-    private BigDecimal gastosAdministrativos;
-
-    @Schema(description = "Comision desembolso initial cost", example = "500.0")
-    private BigDecimal comisionDesembolso;
-
-    @Schema(description = "Comision evaluacion initial cost", example = "265.0")
-    private BigDecimal comisionEvaluacion;
-
     @Schema(description = "Cost of opportunity COK", example = "10.0")
     private BigDecimal cok;
 }

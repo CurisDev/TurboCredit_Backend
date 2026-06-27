@@ -45,9 +45,6 @@ public class VehicleCreditDtoAssembler {
         resource.setSeguroDesgravamenRate(credit.getSeguroDesgravamenRate());
         resource.setSeguroVehicularMonthly(credit.getSeguroVehicularMonthly());
         resource.setPortes(credit.getPortes());
-        resource.setGastosAdministrativos(credit.getGastosAdministrativos());
-        resource.setComisionDesembolso(credit.getComisionDesembolso());
-        resource.setComisionEvaluacion(credit.getComisionEvaluacion());
         resource.setCok(credit.getCok());
 
         return resource;
@@ -89,7 +86,6 @@ public class VehicleCreditDtoAssembler {
         resource.setLifeInsurance(item.getLifeInsurance());
         resource.setVehicularInsurance(item.getVehicularInsurance());
         resource.setPortes(item.getPortes());
-        resource.setAdministrationFee(item.getAdministrationFee());
         resource.setTotalInstallment(item.getTotalInstallment());
 
         return resource;

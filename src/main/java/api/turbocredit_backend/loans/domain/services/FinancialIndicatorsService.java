@@ -26,10 +26,8 @@ public class FinancialIndicatorsService {
         double cokAnnualDouble = cokAnnual.divide(new BigDecimal("100"), 10, RoundingMode.HALF_UP).doubleValue();
         double cokMonthly = Math.pow(1 + cokAnnualDouble, 1.0 / 12.0) - 1;
 
-        // Flujo inicial (positivo para el cliente): Préstamo menos comisiones iniciales
-        BigDecimal comisionDesembolso = loan.getComisionDesembolso() != null ? loan.getComisionDesembolso() : BigDecimal.ZERO;
-        BigDecimal comisionEvaluacion = loan.getComisionEvaluacion() != null ? loan.getComisionEvaluacion() : BigDecimal.ZERO;
-        BigDecimal initialInflow = loan.getLoanAmount().subtract(comisionDesembolso).subtract(comisionEvaluacion);
+        // Flujo inicial (positivo para el cliente): Préstamo
+        BigDecimal initialInflow = loan.getLoanAmount();
 
         double npv = initialInflow.doubleValue();
 
@@ -46,9 +44,7 @@ public class FinancialIndicatorsService {
      * Calcula la TIR (Tasa Interna de Retorno) de los flujos netos usando Newton-Raphson
      */
     public BigDecimal calculateIRR(VehicleCredit loan, List<PaymentScheduleItem> schedule) {
-        BigDecimal comisionDesembolso = loan.getComisionDesembolso() != null ? loan.getComisionDesembolso() : BigDecimal.ZERO;
-        BigDecimal comisionEvaluacion = loan.getComisionEvaluacion() != null ? loan.getComisionEvaluacion() : BigDecimal.ZERO;
-        double initialInflow = loan.getLoanAmount().subtract(comisionDesembolso).subtract(comisionEvaluacion).doubleValue();
+        double initialInflow = loan.getLoanAmount().doubleValue();
 
         double[] flows = new double[schedule.size() + 1];
         flows[0] = initialInflow;

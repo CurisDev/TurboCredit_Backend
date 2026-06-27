@@ -67,9 +67,6 @@ public class VehicleCreditController {
             credit.setSeguroDesgravamenRate(request.getSeguroDesgravamenRate());
             credit.setSeguroVehicularMonthly(request.getSeguroVehicularMonthly());
             credit.setPortes(request.getPortes());
-            credit.setGastosAdministrativos(request.getGastosAdministrativos());
-            credit.setComisionDesembolso(request.getComisionDesembolso());
-            credit.setComisionEvaluacion(request.getComisionEvaluacion());
             credit.setCok(request.getCok());
 
             // Validar riesgo

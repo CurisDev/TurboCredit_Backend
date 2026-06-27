@@ -91,14 +91,6 @@ public class VehicleCredit extends AuditableAbstractAggregateRootWithLongId<Vehi
     @Column(name = "portes", precision = 15, scale = 2)
     private BigDecimal portes = BigDecimal.ZERO;
 
-    @Column(name = "gastos_administrativos", precision = 15, scale = 2)
-    private BigDecimal gastosAdministrativos = BigDecimal.ZERO;
-
-    @Column(name = "comision_desembolso", precision = 15, scale = 2)
-    private BigDecimal comisionDesembolso = BigDecimal.ZERO;
-
-    @Column(name = "comision_evaluacion", precision = 15, scale = 2)
-    private BigDecimal comisionEvaluacion = BigDecimal.ZERO;
 
     @Column(name = "cok", precision = 10, scale = 6)
     private BigDecimal cok = BigDecimal.ZERO;
