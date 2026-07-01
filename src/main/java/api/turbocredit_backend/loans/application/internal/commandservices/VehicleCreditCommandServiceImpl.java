@@ -47,7 +47,7 @@ public class VehicleCreditCommandServiceImpl implements VehicleCreditCommandServ
         // Calcula indicadores financieros
         savedCredit.setNpv(financialIndicatorsService.calculateNPV(savedCredit, schedule));
         savedCredit.setIrr(financialIndicatorsService.calculateIRR(savedCredit, schedule));
-        savedCredit.setTcea(financialIndicatorsService.calculateTCEA(savedCredit.getPeriodicRate()));
+        savedCredit.setTcea(financialIndicatorsService.calculateTCEA(savedCredit.getIrr()));
 
         return vehicleCreditRepository.save(savedCredit);
     }

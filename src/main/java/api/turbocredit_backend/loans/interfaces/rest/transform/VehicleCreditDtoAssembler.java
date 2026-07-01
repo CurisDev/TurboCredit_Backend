@@ -35,6 +35,18 @@ public class VehicleCreditDtoAssembler {
         resource.setTcea(credit.getTcea());
         resource.setStatus(credit.getStatus().toString());
         resource.setBankName(credit.getBankName());
+
+        resource.setClientName(credit.getClientName());
+        resource.setClientDni(credit.getClientDni());
+        resource.setVehicleBrand(credit.getVehicleBrand());
+        resource.setVehicleModel(credit.getVehicleModel());
+        resource.setResidualPercentage(credit.getResidualPercentage());
+        resource.setResidualValue(credit.getResidualValue());
+        resource.setSeguroDesgravamenRate(credit.getSeguroDesgravamenRate());
+        resource.setSeguroVehicularMonthly(credit.getSeguroVehicularMonthly());
+        resource.setPortes(credit.getPortes());
+        resource.setCok(credit.getCok());
+
         return resource;
     }
 
@@ -70,6 +82,12 @@ public class VehicleCreditDtoAssembler {
         resource.setIsPaid(item.getIsPaid());
         resource.setDueDate(item.getDueDate());
         resource.setPaidAt(item.getPaidAt());
+
+        resource.setLifeInsurance(item.getLifeInsurance());
+        resource.setVehicularInsurance(item.getVehicularInsurance());
+        resource.setPortes(item.getPortes());
+        resource.setTotalInstallment(item.getTotalInstallment());
+
         return resource;
     }
 }

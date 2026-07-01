@@ -21,69 +21,86 @@ public class FinancialIndicatorsService {
      * En este caso: VAN = -Principal + Σ(Cuotas / (1 + TEM)^periodo)
      */
     public BigDecimal calculateNPV(VehicleCredit loan, List<PaymentScheduleItem> schedule) {
-        BigDecimal monthlyRate = loan.getPeriodicRate().divide(new BigDecimal(100), 10, RoundingMode.HALF_UP);
-        BigDecimal npv = loan.getPrincipalFinanced().negate(); // Flujo inicial negativo
+        BigDecimal cokAnnual = loan.getCok() != null ? loan.getCok() : new BigDecimal("10.0");
+        // Convertir COK anual a mensual: cokMonthly = (1 + cokAnnual/100)^(1/12) - 1
+        double cokAnnualDouble = cokAnnual.divide(new BigDecimal("100"), 10, RoundingMode.HALF_UP).doubleValue();
+        double cokMonthly = Math.pow(1 + cokAnnualDouble, 1.0 / 12.0) - 1;
+
+        // Flujo inicial (positivo para el cliente): Préstamo
+        BigDecimal initialInflow = loan.getLoanAmount();
+
+        double npv = initialInflow.doubleValue();
 
         for (PaymentScheduleItem item : schedule) {
-            BigDecimal discountFactor = BigDecimal.ONE.add(monthlyRate)
-                    .pow(item.getPeriod());
-            BigDecimal presentValue = item.getInstallment()
-                    .divide(discountFactor, 10, RoundingMode.HALF_UP);
-            npv = npv.add(presentValue);
+            double totalInstallment = item.getTotalInstallment().doubleValue();
+            // Descontar flujo de caja negativo (pago)
+            npv -= totalInstallment / Math.pow(1 + cokMonthly, item.getPeriod());
         }
 
-        return npv.setScale(2, RoundingMode.HALF_UP);
+        return BigDecimal.valueOf(npv).setScale(2, RoundingMode.HALF_UP);
     }
 
     /**
-     * Calcula la TIR (Tasa Interna de Retorno) usando Newton-Raphson
-     * TIR es la tasa que hace VAN = 0
+     * Calcula la TIR (Tasa Interna de Retorno) de los flujos netos usando Newton-Raphson
      */
     public BigDecimal calculateIRR(VehicleCredit loan, List<PaymentScheduleItem> schedule) {
-        BigDecimal irr = new BigDecimal("0.01"); // Tasa inicial: 1%
-        BigDecimal tolerance = new BigDecimal("0.00001");
-        int maxIterations = 100;
+        double initialInflow = loan.getLoanAmount().doubleValue();
 
-        for (int i = 0; i < maxIterations; i++) {
-            BigDecimal npv = calculateNPVAtRate(loan.getPrincipalFinanced(), schedule, irr);
-            BigDecimal npvDerivative = calculateNPVDerivative(schedule, irr);
+        double[] flows = new double[schedule.size() + 1];
+        flows[0] = initialInflow;
 
-            if (npvDerivative.compareTo(BigDecimal.ZERO) == 0) {
+        for (int i = 0; i < schedule.size(); i++) {
+            flows[i + 1] = -schedule.get(i).getTotalInstallment().doubleValue();
+        }
+
+        double irr = 0.01; // Tasa inicial guess: 1% mensual
+        double tolerance = 0.0000001;
+        int maxIterations = 1000;
+
+        for (int iter = 0; iter < maxIterations; iter++) {
+            double npv = 0.0;
+            double npvDerivative = 0.0;
+
+            for (int t = 0; t < flows.length; t++) {
+                double factor = Math.pow(1 + irr, t);
+                npv += flows[t] / factor;
+                if (t > 0) {
+                    npvDerivative -= flows[t] * t / (factor * (1 + irr));
+                }
+            }
+
+            if (Math.abs(npv) < tolerance) {
+                return BigDecimal.valueOf(irr).setScale(10, RoundingMode.HALF_UP);
+            }
+
+            if (npvDerivative == 0) {
                 break;
             }
 
-            BigDecimal nextIrr = irr.subtract(npv.divide(npvDerivative, 10, RoundingMode.HALF_UP));
+            double nextIrr = irr - npv / npvDerivative;
+            if (Double.isNaN(nextIrr) || Double.isInfinite(nextIrr) || nextIrr < -1 || nextIrr > 10) {
+                break;
+            }
 
-            if (nextIrr.subtract(irr).abs().compareTo(tolerance) < 0) {
-                return nextIrr.multiply(new BigDecimal(100))
-                        .setScale(6, RoundingMode.HALF_UP);
+            if (Math.abs(nextIrr - irr) < tolerance) {
+                return BigDecimal.valueOf(nextIrr).setScale(10, RoundingMode.HALF_UP);
             }
 
             irr = nextIrr;
         }
 
-        return irr.multiply(new BigDecimal(100))
-                .setScale(6, RoundingMode.HALF_UP);
+        return BigDecimal.valueOf(irr).setScale(10, RoundingMode.HALF_UP);
     }
 
     /**
-     * Calcula TCEA (Tasa de Costo Efectivo Anual)
-     * TCEA = (1 + TEM)^12 - 1
-     * Donde TEM es obtenida de la TIR
+     * Calcula TCEA (Tasa de Costo Efectivo Anual) a partir de la TIR mensual
+     * TCEA = (1 + TIR_mensual)^12 - 1
      */
-    public BigDecimal calculateTCEA(BigDecimal monthlyRate) {
-        BigDecimal tem = monthlyRate.divide(new BigDecimal(100), 10, RoundingMode.HALF_UP);
-        BigDecimal onePlusTem = BigDecimal.ONE.add(tem);
+    public BigDecimal calculateTCEA(BigDecimal monthlyIrr) {
+        double irr = monthlyIrr.doubleValue();
+        double tceaDouble = Math.pow(1 + irr, 12) - 1;
 
-        // (1 + TEM)^12
-        BigDecimal annualFactor = onePlusTem.pow(12);
-
-        // TCEA = ((1 + TEM)^12 - 1) * 100
-        BigDecimal tcea = annualFactor.subtract(BigDecimal.ONE)
-                .multiply(new BigDecimal(100))
-                .setScale(6, RoundingMode.HALF_UP);
-
-        return tcea;
+        return BigDecimal.valueOf(tceaDouble * 100).setScale(6, RoundingMode.HALF_UP);
     }
 
     private BigDecimal calculateNPVAtRate(BigDecimal principal, List<PaymentScheduleItem> schedule, BigDecimal rate) {

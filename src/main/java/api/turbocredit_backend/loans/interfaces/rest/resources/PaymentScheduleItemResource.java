@@ -46,4 +46,17 @@ public class PaymentScheduleItemResource {
 
     @Schema(description = "Payment date (if paid)", example = "null")
     private Date paidAt;
+
+    @Schema(description = "Life insurance amount", example = "20.00")
+    private BigDecimal lifeInsurance;
+
+    @Schema(description = "Vehicular insurance amount", example = "150.00")
+    private BigDecimal vehicularInsurance;
+
+    @Schema(description = "Portes cost", example = "15.00")
+    private BigDecimal portes;
+
+
+    @Schema(description = "Total installment amount (base + fees)", example = "1051.50")
+    private BigDecimal totalInstallment;
 }

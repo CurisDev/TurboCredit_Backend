@@ -80,4 +80,34 @@ public class VehicleCreditResource {
 
     @Schema(description = "Bank name", example = "BCP")
     private String bankName;
+
+    @Schema(description = "Client name", example = "Juan Perez")
+    private String clientName;
+
+    @Schema(description = "Client DNI", example = "12345678")
+    private String clientDni;
+
+    @Schema(description = "Vehicle brand", example = "Toyota")
+    private String vehicleBrand;
+
+    @Schema(description = "Vehicle model", example = "Corolla")
+    private String vehicleModel;
+
+    @Schema(description = "Residual percentage for final payment", example = "40.0")
+    private BigDecimal residualPercentage;
+
+    @Schema(description = "Residual value", example = "16000.00")
+    private BigDecimal residualValue;
+
+    @Schema(description = "Seguro desgravamen rate", example = "0.0005")
+    private BigDecimal seguroDesgravamenRate;
+
+    @Schema(description = "Seguro vehicular monthly cost", example = "150.0")
+    private BigDecimal seguroVehicularMonthly;
+
+    @Schema(description = "Portes monthly cost", example = "15.0")
+    private BigDecimal portes;
+
+    @Schema(description = "Cost of opportunity COK", example = "10.0")
+    private BigDecimal cok;
 }

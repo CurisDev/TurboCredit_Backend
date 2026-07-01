@@ -45,6 +45,19 @@ public class PaymentScheduleItem {
     @Column(nullable = false)
     private BigDecimal amortization;
 
+    @Column(name = "life_insurance", precision = 15, scale = 2)
+    private BigDecimal lifeInsurance = BigDecimal.ZERO;
+
+    @Column(name = "vehicular_insurance", precision = 15, scale = 2)
+    private BigDecimal vehicularInsurance = BigDecimal.ZERO;
+
+    @Column(name = "portes", precision = 15, scale = 2)
+    private BigDecimal portes = BigDecimal.ZERO;
+
+
+    @Column(name = "total_installment", precision = 15, scale = 2)
+    private BigDecimal totalInstallment = BigDecimal.ZERO;
+
     @NotNull
     @Column(name = "remaining_balance", nullable = false)
     private BigDecimal remainingBalance;
