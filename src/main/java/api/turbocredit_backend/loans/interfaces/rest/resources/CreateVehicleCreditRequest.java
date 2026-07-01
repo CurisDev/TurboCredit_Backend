@@ -70,9 +70,6 @@ public class CreateVehicleCreditRequest {
     @Schema(description = "Client name", example = "Juan Perez")
     private String clientName;
 
-    @Schema(description = "Client DNI", example = "12345678")
-    private String clientDni;
-
     @Schema(description = "Vehicle brand", example = "Toyota")
     private String vehicleBrand;
 

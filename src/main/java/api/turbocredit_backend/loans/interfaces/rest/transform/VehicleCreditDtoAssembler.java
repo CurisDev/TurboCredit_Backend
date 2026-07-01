@@ -33,11 +33,9 @@ public class VehicleCreditDtoAssembler {
         resource.setNpv(credit.getNpv());
         resource.setIrr(credit.getIrr());
         resource.setTcea(credit.getTcea());
-        resource.setStatus(credit.getStatus().toString());
         resource.setBankName(credit.getBankName());
 
         resource.setClientName(credit.getClientName());
-        resource.setClientDni(credit.getClientDni());
         resource.setVehicleBrand(credit.getVehicleBrand());
         resource.setVehicleModel(credit.getVehicleModel());
         resource.setResidualPercentage(credit.getResidualPercentage());

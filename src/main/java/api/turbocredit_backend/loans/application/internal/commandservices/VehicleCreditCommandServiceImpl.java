@@ -1,6 +1,5 @@
 package api.turbocredit_backend.loans.application.internal.commandservices;
 
-import api.turbocredit_backend.loans.domain.exceptions.LoanNotFoundException;
 import api.turbocredit_backend.loans.domain.model.aggregates.VehicleCredit;
 import api.turbocredit_backend.loans.domain.model.entities.PaymentScheduleItem;
 import api.turbocredit_backend.loans.domain.model.entities.VehicleDetails;
@@ -50,30 +49,6 @@ public class VehicleCreditCommandServiceImpl implements VehicleCreditCommandServ
         savedCredit.setTcea(financialIndicatorsService.calculateTCEA(savedCredit.getIrr()));
 
         return vehicleCreditRepository.save(savedCredit);
-    }
-
-    @Override
-    public VehicleCredit approveLoan(Long creditId) {
-        VehicleCredit credit = vehicleCreditRepository.findById(creditId)
-                .orElseThrow(() -> new LoanNotFoundException(creditId));
-        credit.approve();
-        return vehicleCreditRepository.save(credit);
-    }
-
-    @Override
-    public VehicleCredit activateLoan(Long creditId) {
-        VehicleCredit credit = vehicleCreditRepository.findById(creditId)
-                .orElseThrow(() -> new LoanNotFoundException(creditId));
-        credit.activate();
-        return vehicleCreditRepository.save(credit);
-    }
-
-    @Override
-    public VehicleCredit completeLoan(Long creditId) {
-        VehicleCredit credit = vehicleCreditRepository.findById(creditId)
-                .orElseThrow(() -> new LoanNotFoundException(creditId));
-        credit.complete();
-        return vehicleCreditRepository.save(credit);
     }
 
     @Override

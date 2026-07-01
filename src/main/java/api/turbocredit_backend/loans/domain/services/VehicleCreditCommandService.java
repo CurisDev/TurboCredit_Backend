@@ -7,8 +7,5 @@ import java.util.Optional;
 
 public interface VehicleCreditCommandService {
     VehicleCredit createVehicleCredit(VehicleCredit credit);
-    VehicleCredit approveLoan(Long creditId);
-    VehicleCredit activateLoan(Long creditId);
-    VehicleCredit completeLoan(Long creditId);
     void createVehicleDetails(Long creditId, VehicleDetails details);
 }

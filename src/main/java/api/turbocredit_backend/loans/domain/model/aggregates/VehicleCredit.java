@@ -30,9 +30,6 @@ public class VehicleCredit extends AuditableAbstractAggregateRootWithLongId<Vehi
     @Column(name = "client_name")
     private String clientName;
 
-    @Column(name = "client_dni")
-    private String clientDni;
-
     @Column(name = "vehicle_brand")
     private String vehicleBrand;
 
@@ -128,10 +125,6 @@ public class VehicleCredit extends AuditableAbstractAggregateRootWithLongId<Vehi
     @Column(name = "tcea", precision = 10, scale = 6)
     private BigDecimal tcea; // Tasa de Costo Efectivo Anual
 
-    @Enumerated(EnumType.STRING)
-    @Column(name = "status", nullable = false)
-    private LoanStatus status = LoanStatus.PENDING;
-
     @Column(name = "bank_name")
     private String bankName;
 
@@ -176,18 +169,6 @@ public class VehicleCredit extends AuditableAbstractAggregateRootWithLongId<Vehi
         // Inicializa principal y tasa periódica
         this.principalFinanced = loanAmount;
         this.periodicRate = interestRate.toMonthlyEffectiveRate();
-    }
-
-    public void approve() {
-        this.status = LoanStatus.APPROVED;
-    }
-
-    public void activate() {
-        this.status = LoanStatus.ACTIVE;
-    }
-
-    public void complete() {
-        this.status = LoanStatus.COMPLETED;
     }
 
     /**

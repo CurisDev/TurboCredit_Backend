@@ -75,17 +75,11 @@ public class VehicleCreditResource {
     @Schema(description = "Annual Effective Cost Rate (TCEA)", example = "8.75")
     private BigDecimal tcea;
 
-    @Schema(description = "Loan status", example = "PENDING")
-    private String status;
-
     @Schema(description = "Bank name", example = "BCP")
     private String bankName;
 
     @Schema(description = "Client name", example = "Juan Perez")
     private String clientName;
-
-    @Schema(description = "Client DNI", example = "12345678")
-    private String clientDni;
 
     @Schema(description = "Vehicle brand", example = "Toyota")
     private String vehicleBrand;

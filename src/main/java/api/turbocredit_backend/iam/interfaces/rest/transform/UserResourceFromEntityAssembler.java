@@ -10,6 +10,13 @@ public class UserResourceFromEntityAssembler {
         var roles = user.getRoles().stream()
                 .map(Role::getStringName)
                 .toList();
-        return new UserResource(user.getId(), user.getEmail(), user.getFullName(), roles);
+        return new UserResource(
+                user.getId(),
+                user.getEmail(),
+                user.getFirstName(),
+                user.getLastName(),
+                user.getProfileImageUrl(),
+                roles
+        );
     }
 }
