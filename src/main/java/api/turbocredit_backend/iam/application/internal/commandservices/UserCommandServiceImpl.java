@@ -5,6 +5,8 @@ import api.turbocredit_backend.iam.application.internal.outboundservices.tokens.
 import api.turbocredit_backend.iam.domain.model.aggregates.User;
 import api.turbocredit_backend.iam.domain.model.commands.SignInCommand;
 import api.turbocredit_backend.iam.domain.model.commands.SignUpCommand;
+import api.turbocredit_backend.iam.domain.model.commands.UpdateUserProfileCommand;
+import api.turbocredit_backend.iam.domain.model.valueobjects.Roles;
 import api.turbocredit_backend.iam.domain.services.UserCommandService;
 import api.turbocredit_backend.iam.infrastructure.persistence.jpa.repositories.RoleRepository;
 import api.turbocredit_backend.iam.infrastructure.persistence.jpa.repositories.UserRepository;
@@ -35,20 +37,29 @@ public class UserCommandServiceImpl implements UserCommandService {
             throw new RuntimeException("Email already registered");
         }
 
-        var roles = command.roles().stream()
-                .map(role -> roleRepository.findByName(role.getName())
-                        .orElseThrow(() -> new RuntimeException("Role not found: " + role.getName())))
-                .toList();
+        var userRole = roleRepository.findByName(Roles.ROLE_USER)
+                .orElseThrow(() -> new RuntimeException("Role not found: " + Roles.ROLE_USER));
 
         var user = new User(
                 command.email(),
                 hashingService.encode(command.password()),
-                command.fullName(),
-                roles
+                command.firstName(),
+                command.lastName()
         );
+        user.getRoles().clear();
+        user.addRole(userRole);
 
         userRepository.save(user);
         return userRepository.findByEmail(command.email());
+    }
+
+    @Override
+    public Optional<User> handle(UpdateUserProfileCommand command) {
+        var user = userRepository.findById(command.userId())
+                .orElseThrow(() -> new RuntimeException("User not found"));
+        user.updateProfile(command.firstName(), command.lastName(), command.profileImageUrl());
+        userRepository.save(user);
+        return userRepository.findById(command.userId());
     }
 
     @Override

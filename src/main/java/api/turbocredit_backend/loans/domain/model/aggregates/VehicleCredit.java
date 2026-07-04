@@ -27,6 +27,15 @@ public class VehicleCredit extends AuditableAbstractAggregateRootWithLongId<Vehi
     @Column(name = "user_id", nullable = false)
     private UUID userId;
 
+    @Column(name = "client_name")
+    private String clientName;
+
+    @Column(name = "vehicle_brand")
+    private String vehicleBrand;
+
+    @Column(name = "vehicle_model")
+    private String vehicleModel;
+
     @NotNull
     @Column(name = "vehicle_price", nullable = false)
     private BigDecimal vehiclePrice;
@@ -63,6 +72,34 @@ public class VehicleCredit extends AuditableAbstractAggregateRootWithLongId<Vehi
     @Column(name = "insurance_cost", nullable = false)
     private BigDecimal insuranceCost = BigDecimal.ZERO;
 
+    // Campos de Compra Inteligente y tasas/seguros de bancos
+    @Column(name = "residual_percentage", precision = 5, scale = 2)
+    private BigDecimal residualPercentage = BigDecimal.ZERO;
+
+    @Column(name = "residual_value", precision = 15, scale = 2)
+    private BigDecimal residualValue = BigDecimal.ZERO;
+
+    @Column(name = "seguro_desgravamen_rate", precision = 10, scale = 6)
+    private BigDecimal seguroDesgravamenRate = BigDecimal.ZERO;
+
+    @Column(name = "seguro_vehicular_monthly", precision = 15, scale = 2)
+    private BigDecimal seguroVehicularMonthly = BigDecimal.ZERO;
+
+    @Column(name = "portes", precision = 15, scale = 2)
+    private BigDecimal portes = BigDecimal.ZERO;
+
+    @Column(name = "gastos_administrativos", precision = 15, scale = 2)
+    private BigDecimal gastosAdministrativos = BigDecimal.ZERO;
+
+    @Column(name = "comision_desembolso", precision = 15, scale = 2)
+    private BigDecimal comisionDesembolso = BigDecimal.ZERO;
+
+    @Column(name = "comision_evaluacion", precision = 15, scale = 2)
+    private BigDecimal comisionEvaluacion = BigDecimal.ZERO;
+
+    @Column(name = "cok", precision = 10, scale = 6)
+    private BigDecimal cok = BigDecimal.ZERO;
+
     // Atributos calculados
     @Column(name = "principal_financed", nullable = false)
     private BigDecimal principalFinanced;
@@ -88,12 +125,24 @@ public class VehicleCredit extends AuditableAbstractAggregateRootWithLongId<Vehi
     @Column(name = "tcea", precision = 10, scale = 6)
     private BigDecimal tcea; // Tasa de Costo Efectivo Anual
 
-    @Enumerated(EnumType.STRING)
-    @Column(name = "status", nullable = false)
-    private LoanStatus status = LoanStatus.PENDING;
-
     @Column(name = "bank_name")
     private String bankName;
+
+    public void setNpv(BigDecimal npv) {
+        this.npv = npv;
+    }
+
+    public void setIrr(BigDecimal irr) {
+        this.irr = irr;
+    }
+
+    public void setTcea(BigDecimal tcea) {
+        this.tcea = tcea;
+    }
+
+    public BigDecimal getIrr() {
+        return this.irr;
+    }
 
     public VehicleCredit(UUID userId, BigDecimal vehiclePrice, BigDecimal downPayment,
                          BigDecimal loanAmount, InterestRate interestRate, Integer termMonths,
@@ -117,44 +166,51 @@ public class VehicleCredit extends AuditableAbstractAggregateRootWithLongId<Vehi
         this.currency = currency;
         this.insuranceCost = insuranceCost;
 
-        // Calcula principal financiado
-        this.principalFinanced = loanAmount.add(insuranceCost);
-
-        // Calcula tasa periódica
+        // Inicializa principal y tasa periódica
+        this.principalFinanced = loanAmount;
         this.periodicRate = interestRate.toMonthlyEffectiveRate();
     }
 
-    public void approve() {
-        this.status = LoanStatus.APPROVED;
-    }
-
-    public void activate() {
-        this.status = LoanStatus.ACTIVE;
-    }
-
-    public void complete() {
-        this.status = LoanStatus.COMPLETED;
-    }
-
     /**
-     * Calcula la cuota fija usando el método francés
-     * Fórmula: C = P * [r(1+r)^n] / [(1+r)^n - 1]
+     * Calcula la cuota fija usando el método francés de Compra Inteligente (con cuota residual final)
      */
     public BigDecimal calculateFixedInstallment() {
-        BigDecimal r = periodicRate.divide(new BigDecimal(100), 10, RoundingMode.HALF_UP);
-        BigDecimal n = new BigDecimal(termMonths - gracePeriodMonths);
+        double r = periodicRate.divide(new BigDecimal("100"), 10, RoundingMode.HALF_UP).doubleValue();
+        int g = gracePeriodMonths != null ? gracePeriodMonths : 0;
+        int total = termMonths != null ? termMonths : 1;
+        int n = total - g;
 
-        BigDecimal onePlusRPowN = BigDecimal.ONE.add(r).pow(n.intValue());
-        BigDecimal numerator = r.multiply(onePlusRPowN);
-        BigDecimal denominator = onePlusRPowN.subtract(BigDecimal.ONE);
-
-        if (denominator.compareTo(BigDecimal.ZERO) == 0) {
-            throw new ArithmeticException("Invalid calculation: denominator is zero");
+        if (n <= 0) {
+            throw new ArithmeticException("Term months must be greater than grace periods");
         }
 
-        this.fixedInstallment = principalFinanced
-                .multiply(numerator)
-                .divide(denominator, 2, RoundingMode.HALF_UP);
+        // Calcula capitalización durante el período de gracia total: L_g = L_0 * (1 + r)^g
+        double loanAmountDouble = loanAmount.doubleValue();
+        double l_g = loanAmountDouble * Math.pow(1 + r, g);
+
+        // Calcula el valor residual final (VF)
+        double vf = 0;
+        if (residualPercentage != null && residualPercentage.compareTo(BigDecimal.ZERO) > 0) {
+            this.residualValue = vehiclePrice.multiply(residualPercentage).divide(new BigDecimal("100"), 2, RoundingMode.HALF_UP);
+            vf = this.residualValue.doubleValue();
+        } else if (residualValue != null) {
+            vf = residualValue.doubleValue();
+        }
+
+        // Principal ajustado: L_adj = L_g - VF / (1 + r)^n
+        double l_adj = l_g - (vf / Math.pow(1 + r, n));
+
+        double installmentDouble;
+        if (r == 0) {
+            installmentDouble = l_adj / n;
+        } else {
+            // Fórmula cuota francesa: C = L_adj * [r * (1 + r)^n] / [(1 + r)^n - 1]
+            double factor = Math.pow(1 + r, n);
+            installmentDouble = l_adj * (r * factor) / (factor - 1);
+        }
+
+        this.fixedInstallment = BigDecimal.valueOf(installmentDouble).setScale(2, RoundingMode.HALF_UP);
+        this.principalFinanced = BigDecimal.valueOf(l_g).setScale(2, RoundingMode.HALF_UP);
 
         return this.fixedInstallment;
     }
@@ -163,8 +219,14 @@ public class VehicleCredit extends AuditableAbstractAggregateRootWithLongId<Vehi
      * Calcula el interés total pagado
      */
     public BigDecimal calculateTotalInterest() {
-        BigDecimal totalPayments = fixedInstallment.multiply(new BigDecimal(termMonths - gracePeriodMonths));
-        this.totalInterestPaid = totalPayments.subtract(principalFinanced);
+        int g = gracePeriodMonths != null ? gracePeriodMonths : 0;
+        int total = termMonths != null ? termMonths : 1;
+        int n = total - g;
+        BigDecimal payments = fixedInstallment.multiply(BigDecimal.valueOf(n));
+        if (residualValue != null) {
+            payments = payments.add(residualValue);
+        }
+        this.totalInterestPaid = payments.subtract(loanAmount);
         return this.totalInterestPaid;
     }
 
@@ -172,7 +234,14 @@ public class VehicleCredit extends AuditableAbstractAggregateRootWithLongId<Vehi
      * Calcula el total a pagar
      */
     public BigDecimal calculateTotalPaid() {
-        this.totalPaid = principalFinanced.add(totalInterestPaid);
+        int g = gracePeriodMonths != null ? gracePeriodMonths : 0;
+        int total = termMonths != null ? termMonths : 1;
+        int n = total - g;
+        BigDecimal payments = fixedInstallment.multiply(BigDecimal.valueOf(n));
+        if (residualValue != null) {
+            payments = payments.add(residualValue);
+        }
+        this.totalPaid = payments;
         return this.totalPaid;
     }
 }

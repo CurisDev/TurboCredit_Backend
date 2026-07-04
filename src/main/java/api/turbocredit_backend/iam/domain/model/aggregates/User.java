@@ -4,14 +4,12 @@ import api.turbocredit_backend.iam.domain.model.valueobjects.Role;
 import api.turbocredit_backend.iam.domain.model.valueobjects.Roles;
 import api.turbocredit_backend.shared.domain.model.aggregates.AuditableAbstractAggregateRoot;
 import jakarta.persistence.*;
-import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 import lombok.Getter;
 import lombok.Setter;
 
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
 @Getter
@@ -31,7 +29,14 @@ public class User extends AuditableAbstractAggregateRoot<User> {
 
     @NotBlank
     @Size(max = 255)
-    private String fullName;
+    private String firstName;
+
+    @NotBlank
+    @Size(max = 255)
+    private String lastName;
+
+    @Size(max = 512)
+    private String profileImageUrl;
 
     @ManyToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
     @JoinTable(
@@ -45,24 +50,23 @@ public class User extends AuditableAbstractAggregateRoot<User> {
         this.roles = new HashSet<>();
     }
 
-    public User(String email, String passwordHash, String fullName) {
+    public User(String email, String passwordHash, String firstName, String lastName) {
         this.email = email;
         this.passwordHash = passwordHash;
-        this.fullName = fullName;
+        this.firstName = firstName;
+        this.lastName = lastName;
         this.roles = new HashSet<>();
         this.roles.add(new Role(Roles.ROLE_USER));
-    }
-
-    public User(String email, String passwordHash, String fullName, List<Role> roles) {
-        this(email, passwordHash, fullName);
-        if (roles != null && !roles.isEmpty()) {
-            this.roles.clear();
-            this.roles.addAll(roles);
-        }
     }
 
     public User addRole(Role role) {
         this.roles.add(role);
         return this;
+    }
+
+    public void updateProfile(String firstName, String lastName, String profileImageUrl) {
+        this.firstName = firstName;
+        this.lastName = lastName;
+        this.profileImageUrl = profileImageUrl;
     }
 }

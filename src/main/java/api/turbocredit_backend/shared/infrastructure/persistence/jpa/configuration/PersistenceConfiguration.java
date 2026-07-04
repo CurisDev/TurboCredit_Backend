@@ -7,8 +7,7 @@ import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 @EnableJpaRepositories(
         basePackages = {
                 "api.turbocredit_backend.iam.infrastructure.persistence.jpa.repositories",
-                "api.turbocredit_backend.loans.infrastructure.persistence.jpa.repositories",
-                "api.turbocredit_backend.profiles.infrastructure.persistence.jpa.repositories"
+                "api.turbocredit_backend.loans.infrastructure.persistence.jpa.repositories"
         }
 )
 public class PersistenceConfiguration {

@@ -58,6 +58,19 @@ public class VehicleCreditController {
                     request.getInsuranceCost()
             );
 
+            // Cargar datos adicionales del crédito vehicular
+            credit.setClientName(request.getClientName());
+            credit.setVehicleBrand(request.getVehicleBrand());
+            credit.setVehicleModel(request.getVehicleModel());
+            credit.setResidualPercentage(request.getResidualPercentage());
+            credit.setSeguroDesgravamenRate(request.getSeguroDesgravamenRate());
+            credit.setSeguroVehicularMonthly(request.getSeguroVehicularMonthly());
+            credit.setPortes(request.getPortes());
+            credit.setGastosAdministrativos(request.getGastosAdministrativos());
+            credit.setComisionDesembolso(request.getComisionDesembolso());
+            credit.setComisionEvaluacion(request.getComisionEvaluacion());
+            credit.setCok(request.getCok());
+
             // Validar riesgo
             if (request.getMonthlyIncome() != null) {
                 credit.calculateFixedInstallment(); // Asegurar que exista cuota fija antes de validar riesgo
@@ -93,32 +106,5 @@ public class VehicleCreditController {
                 .map(VehicleCreditDtoAssembler::toResource)
                 .toList();
         return ResponseEntity.ok(resources);
-    }
-
-    @GetMapping("/user/{userId}")
-    @Operation(summary = "Get all vehicle credits by user ID")
-    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
-    public ResponseEntity<?> getVehicleCreditsByUserId(@PathVariable UUID userId) {
-        var credits = vehicleCreditQueryService.findByUserId(userId);
-        var resources = credits.stream()
-                .map(VehicleCreditDtoAssembler::toResource)
-                .toList();
-        return ResponseEntity.ok(resources);
-    }
-
-    @PutMapping("/{creditId}/approve")
-    @Operation(summary = "Approve a vehicle credit")
-    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
-    public ResponseEntity<VehicleCreditResource> approveCredit(@PathVariable Long creditId) {
-        var credit = vehicleCreditCommandService.approveLoan(creditId);
-        return ResponseEntity.ok(VehicleCreditDtoAssembler.toResource(credit));
-    }
-
-    @PutMapping("/{creditId}/activate")
-    @Operation(summary = "Activate a vehicle credit")
-    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
-    public ResponseEntity<VehicleCreditResource> activateCredit(@PathVariable Long creditId) {
-        var credit = vehicleCreditCommandService.activateLoan(creditId);
-        return ResponseEntity.ok(VehicleCreditDtoAssembler.toResource(credit));
     }
 }
