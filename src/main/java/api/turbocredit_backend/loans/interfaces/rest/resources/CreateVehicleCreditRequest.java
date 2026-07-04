@@ -99,4 +99,32 @@ public class CreateVehicleCreditRequest {
 
     @Schema(description = "Cost of opportunity COK", example = "10.0")
     private BigDecimal cok;
+
+    // --- Resultados calculados en el frontend (fuente de verdad) ---
+    // Si se envían, el backend los persiste tal cual en lugar de recalcularlos,
+    // garantizando que el historial coincida exactamente con lo mostrado al usuario.
+
+    @Schema(description = "Fixed monthly installment computed on the client", example = "1558.20")
+    private BigDecimal fixedInstallment;
+
+    @Schema(description = "Principal financed computed on the client", example = "48000.00")
+    private BigDecimal principalFinanced;
+
+    @Schema(description = "Residual value computed on the client", example = "16000.00")
+    private BigDecimal residualValue;
+
+    @Schema(description = "Total interest paid computed on the client", example = "8095.20")
+    private BigDecimal totalInterestPaid;
+
+    @Schema(description = "Total paid computed on the client", example = "58975.20")
+    private BigDecimal totalPaid;
+
+    @Schema(description = "Net Present Value (VAN) computed on the client", example = "850.00")
+    private BigDecimal npv;
+
+    @Schema(description = "Internal Rate of Return (TIR) computed on the client", example = "1.52")
+    private BigDecimal irr;
+
+    @Schema(description = "Annual Effective Cost Rate (TCEA) computed on the client", example = "19.85")
+    private BigDecimal tcea;
 }

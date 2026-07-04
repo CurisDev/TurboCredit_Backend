@@ -7,5 +7,6 @@ import java.util.Optional;
 
 public interface VehicleCreditCommandService {
     VehicleCredit createVehicleCredit(VehicleCredit credit);
+    VehicleCredit updateVehicleCredit(Long creditId, VehicleCredit updated, java.util.UUID userId);
     void createVehicleDetails(Long creditId, VehicleDetails details);
 }
