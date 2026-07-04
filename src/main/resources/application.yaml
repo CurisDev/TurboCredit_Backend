@@ -26,10 +26,10 @@ documentation:
     version: "1.0.0"
 
 server:
-  port: 8082
+  port: ${PORT:8082}
 
 authorization:
   jwt:
-    secret: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiYWRtaW4iOnRydWUsImlhdCI6MTUxNjIzOTAyMn0.KMUFsIDTnFmyG3nMiGM6H9FNFUROf3wh7SmqJp-QV30"
+    secret: ${JWT_SECRET}
     expiration:
       days: 7
