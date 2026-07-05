@@ -1,0 +1,8 @@
+target/
+.git/
+.idea/
+.vscode/
+files/
+*.iml
+.env
+HELP.md
