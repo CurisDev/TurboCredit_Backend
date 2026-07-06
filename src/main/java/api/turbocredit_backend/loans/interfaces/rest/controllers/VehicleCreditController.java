@@ -112,6 +112,7 @@ public class VehicleCreditController {
         credit.setSeguroVehicularMonthly(request.getSeguroVehicularMonthly());
         credit.setPortes(request.getPortes());
         credit.setGastosAdministrativos(request.getGastosAdministrativos());
+        credit.setGpsPrice(request.getGpsPrice());
         credit.setComisionDesembolso(request.getComisionDesembolso());
         credit.setComisionEvaluacion(request.getComisionEvaluacion());
         credit.setCok(request.getCok());

@@ -1,5 +1,5 @@
 # ---- Build stage ----
-FROM eclipse-temurin:25-jdk AS build
+FROM eclipse-temurin:21-jdk AS build
 WORKDIR /app
 
 # Copiar el wrapper de Maven y la configuración primero (mejor cache de capas)
@@ -12,7 +12,7 @@ COPY src/ src/
 RUN ./mvnw clean package -DskipTests -B
 
 # ---- Runtime stage ----
-FROM eclipse-temurin:25-jre
+FROM eclipse-temurin:21-jre
 WORKDIR /app
 COPY --from=build /app/target/*.jar app.jar
 

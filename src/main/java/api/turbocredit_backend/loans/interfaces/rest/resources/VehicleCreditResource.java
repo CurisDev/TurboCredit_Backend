@@ -105,6 +105,9 @@ public class VehicleCreditResource {
     @Schema(description = "Gastos administrativos monthly cost", example = "30.0")
     private BigDecimal gastosAdministrativos;
 
+    @Schema(description = "GPS device price (one-time cost)", example = "1000.0")
+    private BigDecimal gpsPrice;
+
     @Schema(description = "Comision desembolso initial cost", example = "500.0")
     private BigDecimal comisionDesembolso;
 

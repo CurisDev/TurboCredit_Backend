@@ -91,6 +91,10 @@ public class VehicleCredit extends AuditableAbstractAggregateRootWithLongId<Vehi
     @Column(name = "gastos_administrativos", precision = 15, scale = 2)
     private BigDecimal gastosAdministrativos = BigDecimal.ZERO;
 
+    // Precio del GPS (costo único de instalación). Rango válido: [1000, 5000]
+    @Column(name = "gps_price", precision = 15, scale = 2)
+    private BigDecimal gpsPrice = BigDecimal.ZERO;
+
     @Column(name = "comision_desembolso", precision = 15, scale = 2)
     private BigDecimal comisionDesembolso = BigDecimal.ZERO;
 
