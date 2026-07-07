@@ -189,7 +189,7 @@ public class VehicleCredit extends AuditableAbstractAggregateRootWithLongId<Vehi
         // Calcula el valor residual final (VF)
         double vf = 0;
         if (residualPercentage != null && residualPercentage.compareTo(BigDecimal.ZERO) > 0) {
-            this.residualValue = vehiclePrice.multiply(residualPercentage).divide(new BigDecimal("100"), 2, RoundingMode.HALF_UP);
+            this.residualValue = vehiclePrice.multiply(residualPercentage).divide(new BigDecimal("100"), 10, RoundingMode.HALF_UP);
             vf = this.residualValue.doubleValue();
         } else if (residualValue != null) {
             vf = residualValue.doubleValue();
@@ -207,8 +207,8 @@ public class VehicleCredit extends AuditableAbstractAggregateRootWithLongId<Vehi
             installmentDouble = l_adj * (r * factor) / (factor - 1);
         }
 
-        this.fixedInstallment = BigDecimal.valueOf(installmentDouble).setScale(2, RoundingMode.HALF_UP);
-        this.principalFinanced = BigDecimal.valueOf(l_g).setScale(2, RoundingMode.HALF_UP);
+        this.fixedInstallment = BigDecimal.valueOf(installmentDouble);
+        this.principalFinanced = BigDecimal.valueOf(l_g);
 
         return this.fixedInstallment;
     }

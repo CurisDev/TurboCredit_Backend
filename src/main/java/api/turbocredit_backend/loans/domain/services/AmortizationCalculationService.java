@@ -39,7 +39,7 @@ public class AmortizationCalculationService {
             calendar.add(Calendar.MONTH, 1);
             Date dueDate = (Date) calendar.getTime().clone();
 
-            BigDecimal interestDueGrace = remainingBalance.multiply(monthlyRate).setScale(2, RoundingMode.HALF_UP);
+            BigDecimal interestDueGrace = remainingBalance.multiply(monthlyRate);
             BigDecimal amortizationDueGrace = BigDecimal.ZERO;
             BigDecimal installmentDueGrace = BigDecimal.ZERO;
 
@@ -52,15 +52,14 @@ public class AmortizationCalculationService {
             }
 
             // Seguros y gastos mensuales
-            BigDecimal lifeInsurance = remainingBalance.multiply(loan.getSeguroDesgravamenRate()).setScale(2, RoundingMode.HALF_UP);
+            BigDecimal lifeInsurance = remainingBalance.multiply(loan.getSeguroDesgravamenRate());
             BigDecimal vehicularInsurance = loan.getSeguroVehicularMonthly() != null ? loan.getSeguroVehicularMonthly() : BigDecimal.ZERO;
             BigDecimal portes = loan.getPortes() != null ? loan.getPortes() : BigDecimal.ZERO;
 
             BigDecimal totalInstallment = installmentDueGrace
                     .add(lifeInsurance)
                     .add(vehicularInsurance)
-                    .add(portes)
-                    .setScale(2, RoundingMode.HALF_UP);
+                    .add(portes);
 
             PaymentScheduleItem item = PaymentScheduleItem.builder()
                     .creditId(loan.getId())
@@ -91,7 +90,7 @@ public class AmortizationCalculationService {
             BigDecimal balanceBeforePayment = remainingBalance;
 
             // Interés = Saldo pendiente * Tasa mensual
-            BigDecimal interest = balanceBeforePayment.multiply(monthlyRate).setScale(2, RoundingMode.HALF_UP);
+            BigDecimal interest = balanceBeforePayment.multiply(monthlyRate);
 
             BigDecimal amortization;
             BigDecimal installment;
@@ -105,20 +104,19 @@ public class AmortizationCalculationService {
             } else {
                 // Amortización = Cuota fija - Interés
                 installment = fixedInstallment;
-                amortization = installment.subtract(interest).setScale(2, RoundingMode.HALF_UP);
-                remainingBalance = remainingBalance.subtract(amortization).setScale(2, RoundingMode.HALF_UP);
+                amortization = installment.subtract(interest);
+                remainingBalance = remainingBalance.subtract(amortization);
             }
 
             // Seguros y gastos mensuales
-            BigDecimal lifeInsurance = balanceBeforePayment.multiply(loan.getSeguroDesgravamenRate()).setScale(2, RoundingMode.HALF_UP);
+            BigDecimal lifeInsurance = balanceBeforePayment.multiply(loan.getSeguroDesgravamenRate());
             BigDecimal vehicularInsurance = loan.getSeguroVehicularMonthly() != null ? loan.getSeguroVehicularMonthly() : BigDecimal.ZERO;
             BigDecimal portes = loan.getPortes() != null ? loan.getPortes() : BigDecimal.ZERO;
 
             BigDecimal totalInstallment = installment
                     .add(lifeInsurance)
                     .add(vehicularInsurance)
-                    .add(portes)
-                    .setScale(2, RoundingMode.HALF_UP);
+                    .add(portes);
 
             PaymentScheduleItem item = PaymentScheduleItem.builder()
                     .creditId(loan.getId())
