@@ -94,9 +94,8 @@ public class VehicleCreditCommandServiceImpl implements VehicleCreditCommandServ
         existing.setSeguroDesgravamenRate(updated.getSeguroDesgravamenRate());
         existing.setSeguroVehicularMonthly(updated.getSeguroVehicularMonthly());
         existing.setPortes(updated.getPortes());
-        existing.setGastosAdministrativos(updated.getGastosAdministrativos());
-        existing.setComisionDesembolso(updated.getComisionDesembolso());
-        existing.setComisionEvaluacion(updated.getComisionEvaluacion());
+        existing.setGpsPrice(updated.getGpsPrice());
+        existing.setEvaluacionSeguroExterno(updated.getEvaluacionSeguroExterno());
         existing.setCok(updated.getCok());
         existing.setBankName(updated.getBankName());
         existing.setPrincipalFinanced(updated.getPrincipalFinanced());

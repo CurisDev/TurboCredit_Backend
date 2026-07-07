@@ -88,14 +88,12 @@ public class VehicleCredit extends AuditableAbstractAggregateRootWithLongId<Vehi
     @Column(name = "portes", precision = 15, scale = 2)
     private BigDecimal portes = BigDecimal.ZERO;
 
-    @Column(name = "gastos_administrativos", precision = 15, scale = 2)
-    private BigDecimal gastosAdministrativos = BigDecimal.ZERO;
+    // Precio del GPS (costo único de instalación). Rango válido: [1000, 5000]
+    @Column(name = "gps_price", precision = 15, scale = 2)
+    private BigDecimal gpsPrice = BigDecimal.ZERO;
 
-    @Column(name = "comision_desembolso", precision = 15, scale = 2)
-    private BigDecimal comisionDesembolso = BigDecimal.ZERO;
-
-    @Column(name = "comision_evaluacion", precision = 15, scale = 2)
-    private BigDecimal comisionEvaluacion = BigDecimal.ZERO;
+    @Column(name = "evaluacion_seguro_externo", precision = 15, scale = 2)
+    private BigDecimal evaluacionSeguroExterno = BigDecimal.ZERO;
 
     @Column(name = "cok", precision = 10, scale = 6)
     private BigDecimal cok = BigDecimal.ZERO;
@@ -191,7 +189,7 @@ public class VehicleCredit extends AuditableAbstractAggregateRootWithLongId<Vehi
         // Calcula el valor residual final (VF)
         double vf = 0;
         if (residualPercentage != null && residualPercentage.compareTo(BigDecimal.ZERO) > 0) {
-            this.residualValue = vehiclePrice.multiply(residualPercentage).divide(new BigDecimal("100"), 2, RoundingMode.HALF_UP);
+            this.residualValue = vehiclePrice.multiply(residualPercentage).divide(new BigDecimal("100"), 10, RoundingMode.HALF_UP);
             vf = this.residualValue.doubleValue();
         } else if (residualValue != null) {
             vf = residualValue.doubleValue();
@@ -209,8 +207,8 @@ public class VehicleCredit extends AuditableAbstractAggregateRootWithLongId<Vehi
             installmentDouble = l_adj * (r * factor) / (factor - 1);
         }
 
-        this.fixedInstallment = BigDecimal.valueOf(installmentDouble).setScale(2, RoundingMode.HALF_UP);
-        this.principalFinanced = BigDecimal.valueOf(l_g).setScale(2, RoundingMode.HALF_UP);
+        this.fixedInstallment = BigDecimal.valueOf(installmentDouble);
+        this.principalFinanced = BigDecimal.valueOf(l_g);
 
         return this.fixedInstallment;
     }
