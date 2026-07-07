@@ -54,8 +54,7 @@ public class PaymentScheduleItem {
     @Column(name = "portes", precision = 15, scale = 2)
     private BigDecimal portes = BigDecimal.ZERO;
 
-    @Column(name = "administration_fee", precision = 15, scale = 2)
-    private BigDecimal administrationFee = BigDecimal.ZERO;
+
 
     @Column(name = "total_installment", precision = 15, scale = 2)
     private BigDecimal totalInstallment = BigDecimal.ZERO;

@@ -56,8 +56,7 @@ public class PaymentScheduleItemResource {
     @Schema(description = "Portes cost", example = "15.00")
     private BigDecimal portes;
 
-    @Schema(description = "Administration fee cost", example = "30.00")
-    private BigDecimal administrationFee;
+
 
     @Schema(description = "Total installment amount (base + fees)", example = "1051.50")
     private BigDecimal totalInstallment;

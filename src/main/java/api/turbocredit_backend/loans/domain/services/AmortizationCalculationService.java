@@ -55,13 +55,11 @@ public class AmortizationCalculationService {
             BigDecimal lifeInsurance = remainingBalance.multiply(loan.getSeguroDesgravamenRate()).setScale(2, RoundingMode.HALF_UP);
             BigDecimal vehicularInsurance = loan.getSeguroVehicularMonthly() != null ? loan.getSeguroVehicularMonthly() : BigDecimal.ZERO;
             BigDecimal portes = loan.getPortes() != null ? loan.getPortes() : BigDecimal.ZERO;
-            BigDecimal adminFee = loan.getGastosAdministrativos() != null ? loan.getGastosAdministrativos() : BigDecimal.ZERO;
 
             BigDecimal totalInstallment = installmentDueGrace
                     .add(lifeInsurance)
                     .add(vehicularInsurance)
                     .add(portes)
-                    .add(adminFee)
                     .setScale(2, RoundingMode.HALF_UP);
 
             PaymentScheduleItem item = PaymentScheduleItem.builder()
@@ -74,7 +72,6 @@ public class AmortizationCalculationService {
                     .lifeInsurance(lifeInsurance)
                     .vehicularInsurance(vehicularInsurance)
                     .portes(portes)
-                    .administrationFee(adminFee)
                     .totalInstallment(totalInstallment)
                     .remainingBalance(remainingBalance)
                     .isGracePeriod(true)
@@ -116,13 +113,11 @@ public class AmortizationCalculationService {
             BigDecimal lifeInsurance = balanceBeforePayment.multiply(loan.getSeguroDesgravamenRate()).setScale(2, RoundingMode.HALF_UP);
             BigDecimal vehicularInsurance = loan.getSeguroVehicularMonthly() != null ? loan.getSeguroVehicularMonthly() : BigDecimal.ZERO;
             BigDecimal portes = loan.getPortes() != null ? loan.getPortes() : BigDecimal.ZERO;
-            BigDecimal adminFee = loan.getGastosAdministrativos() != null ? loan.getGastosAdministrativos() : BigDecimal.ZERO;
 
             BigDecimal totalInstallment = installment
                     .add(lifeInsurance)
                     .add(vehicularInsurance)
                     .add(portes)
-                    .add(adminFee)
                     .setScale(2, RoundingMode.HALF_UP);
 
             PaymentScheduleItem item = PaymentScheduleItem.builder()
@@ -135,7 +130,6 @@ public class AmortizationCalculationService {
                     .lifeInsurance(lifeInsurance)
                     .vehicularInsurance(vehicularInsurance)
                     .portes(portes)
-                    .administrationFee(adminFee)
                     .totalInstallment(totalInstallment)
                     .remainingBalance(remainingBalance)
                     .isGracePeriod(false)
